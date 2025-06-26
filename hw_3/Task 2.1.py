@@ -1,3 +1,6 @@
+import datetime
+
+
 zones = {
     "COFFEE": "Coffee",
     "STORAGE": "Storage",
@@ -27,10 +30,65 @@ class Employee:
         return self.__access_zones
 
 
+def requires_access(func):
+
+    def wrapper(self, *args, **kwargs):
+
+        if args:
+            employee, zone = args
+        elif kwargs:
+            employee, zone = kwargs.values()
+
+        if zone not in employee.get_access_zones():
+            print("Доступ запрещён.")
+            self.access_code = 0
+
+        else:
+            result = func(*args, **kwargs)
+            self.access_code = 1
+
+            return result
+
+    return wrapper
+
+
+def log_access(func):
+
+    def wrapper(self, *args, **kwargs):
+
+        if args:
+            employee, zone = args
+        elif kwargs:
+            employee, zone = kwargs.values()
+
+        if self.access_code == 1:
+            self.__access_denied.append(f"{employee.get_name()} ({datetime.datetime})")
+        else:
+            result = func(*args, **kwargs)
+            self.__access_granted.append(f"{employee.get_name()} ({datetime.datetime})")
+
+            return result
+
+    return wrapper
+
+
 class SecuritySystem:
 
-    def requires_access(self, zone):
-        pass
+    def __init__(self):
+        self.access_granted = []
+        self.access_denied = []
+        self.access_code = None
 
-    def enter_zone(self, employee, zone):
-        pass
+    @log_access
+    @requires_access
+    def enter_zone(self, employee: Employee, zone: str):
+        print(f"Доступ разрешён, добро пожаловать {employee.get_name()}!")
+
+
+e1 = Employee("Lan", ["COFFEE", "STORAGE"])
+e2 = Employee("Voa", ["STORAGE", "LAB"])
+
+ss = SecuritySystem()
+
+
+# Я старался, не вышло. До конца не понятно как это делается.
