@@ -14,7 +14,7 @@ threads = []
 
 for i in range(1, 4):
     name = f"Поток {i}"
-    thread = threading.Thread(target=add_random_numbers())
+    thread = threading.Thread(target=add_random_numbers(), name=name)
     thread.start()
     print(shared_list) # "проверка" того, что список обновляется
     threads.append(thread)
