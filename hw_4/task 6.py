@@ -19,15 +19,31 @@ def list_splitter(list: list):
 
 
 split_list = list_splitter(int_list)
-lists_sum, threads = [], []
+partial_sums, threads = [], []
+
+
+def calculate_sum(current_split: int, start: int, end: int, index: int):
+    current_sum = 0
+
+    while start != end + 1:
+        current_sum += split_list[current_split][start]
+        start += 1
+
+    if index > len(partial_sums) - 1:
+        partial_sums.append(current_sum)
+    elif index < len(partial_sums):
+        partial_sums.insert(0, current_sum)
+    else:
+        partial_sums.insert(index, current_sum)
+
 
 for i in range(5):
     name = f"Поток {i}"
-    thread = threading.Thread(target=lists_sum.append(sum(split_list[i])), name=name)
+    thread = threading.Thread(target=calculate_sum(i, 0, 4, i), name=name)
     thread.start()
-    print(lists_sum) # "проверка" того, что список обновляется
+    print(partial_sums) # "проверка" того, что список обновляется
     threads.append(thread)
-    result = sum(lists_sum)
+    result = sum(partial_sums)
 
 for t in threads:
     t.join()
